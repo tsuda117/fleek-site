@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+      type="application/javascript"
+    ></script>
+    <button onclick="connect()">Connect to MetaMask</button>
+    <button onclick="getBalance()">Get user balance</button>
+    <script>
+
+let provider;
+let signer;
+let accounts;
+let contract = null;
+
+const ADDRESS = "0x14f2913Dc188481B2e2F16e7681638DC01E92D4f";
+const ABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "getMessage",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getSender",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_str",
+				"type": "string"
+			}
+		],
+		"name": "setMessage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+
+        const connect = async()=>{
+     provider = new ethers.providers.Web3Provider(
+        window.ethereum,
+        "any"
+      );
+      accounts = await provider.send("eth_requestAccounts", []);
+      console.log(accounts[0]);
+       signer = await provider.getSigner(accounts[0]);
+       console.log(signer);
+
+       contract = new ethers.Contract(ADDRESS,ABI,signer);
+       console.log(contract);
+       
+       const message = await contract.connect(accounts[0]).getSender();
+       console.log(message);
+
+	   const message2 = await contract.connect(accounts[0]).getMessage();
+       console.log(message2);
+
+
+	   const tx = await contract.setMessage("Hello there");
+	   console.log(tx.hash);
+
+	   
+
+      (async function () {
+        let userAddress = await signer.getAddress();
+        document.getElementById("wallet").innerText =
+          "Your wallet is " + userAddress;
+      })();
+
+
+    }
+
+    
+    </script>
+  </head>
+  <body>
+    <div id="wallet"></div>
+  </body>
+</html>
